@@ -8,7 +8,7 @@ import org.koin.core.KoinApplication
 import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
 
-fun Application.configureDependecyInjection(){
+fun Application.configureDependencyInjection(){
     install(Koin) {
         slf4jLogger()
         configureKoinModules()
