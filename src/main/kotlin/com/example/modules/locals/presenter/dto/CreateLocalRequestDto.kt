@@ -9,11 +9,12 @@ data class CreateLocalRequestDto(
     val cep: Int,
     val name: String,
     val description: String,
+    val category: String,
     val type: String
 )
 
 @Serializable
 data class CreateLocalDto(
     val userId: Long,
-    val requestDto: CreateLocalRequestDto
+    val dto: CreateLocalRequestDto
 )
