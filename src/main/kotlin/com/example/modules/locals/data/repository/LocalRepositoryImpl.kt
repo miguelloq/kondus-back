@@ -8,7 +8,7 @@ import org.jetbrains.exposed.sql.insert
 class LocalRepositoryImpl: LocalRepository {
     override suspend fun create(
         model: LocalModel,
-        creatorUsedId: Long
+        creatorUserId: Long
     ): Long = suspendTransaction{
         val id = Locals.insert{
             it[street] = model.address.street.s
