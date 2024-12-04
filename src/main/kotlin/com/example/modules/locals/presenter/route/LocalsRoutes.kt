@@ -1,12 +1,13 @@
 package com.example.modules.locals.presenter.route
 
 import com.example.core.models.AuthenticationType
+import com.example.core.models.CoreUser
+import com.example.core.models.RequestWrapDto
 import com.example.core.plugins.getUserId
 import com.example.modules.locals.domain.error.LocalError
 import com.example.modules.locals.domain.usecase.CreateLocalUsecase
-import com.example.modules.locals.presenter.dto.CreateLocalDto
-import com.example.modules.locals.presenter.dto.CreateLocalRequestDto
-import com.example.modules.locals.presenter.dto.CreateLocalResponseDto
+import com.example.modules.locals.presenter.dto.local.request.CreateLocalRequestDto
+import com.example.modules.locals.presenter.dto.local.response.CreateLocalResponseDto
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
@@ -27,7 +28,8 @@ fun Route.localsRoutes(
                     ?: call.respond(HttpStatusCode.Unauthorized).let{ return@post }
 
                 val request = call.receive<CreateLocalRequestDto>()
-                val id = createLocalUsecase(CreateLocalDto(userId,request))
+                val wrap = RequestWrapDto(request,CoreUser.Id(userId))
+                val id = createLocalUsecase(wrap)
                 call.respond(CreateLocalResponseDto(id))
             }catch(localErr: LocalError){
                 call.respond(HttpStatusCode.BadRequest,localErr.message)

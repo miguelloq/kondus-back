@@ -1,4 +1,4 @@
-package com.example.modules.locals.presenter.dto
+package com.example.modules.locals.presenter.dto.local.request
 
 import kotlinx.serialization.Serializable
 
@@ -11,10 +11,4 @@ data class CreateLocalRequestDto(
     val description: String,
     val category: String,
     val type: String
-)
-
-@Serializable
-data class CreateLocalDto(
-    val userId: Long,
-    val dto: CreateLocalRequestDto
 )
