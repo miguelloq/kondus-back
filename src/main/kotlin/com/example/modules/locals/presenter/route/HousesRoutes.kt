@@ -38,8 +38,18 @@ fun Route.housesRoutes(
             }
         }
 
-        get("/all"){}
+        get{
+            catchingHttpAndId<LocalError>(){ id ->
+                val houses = getAllHousesFromUserUsecase(id)
+                val response = houses.map{ it.toResponse() }
+                call.respond(response)
+            }
+        }
 
         put("/user"){}
     }
+}
+
+private fun IdDomainModelWrapDto<Long, HouseModel>.toResponse() = let{ (id,model) ->
+    GetAllHousesFromUserResponseDto(id, model)
 }
