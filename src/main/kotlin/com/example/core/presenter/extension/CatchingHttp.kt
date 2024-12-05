@@ -1,5 +1,6 @@
-package com.example.core.models
+package com.example.core.presenter.extension
 
+import com.example.core.models.CoreUser
 import com.example.core.plugins.getUserId
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.routing.RoutingContext

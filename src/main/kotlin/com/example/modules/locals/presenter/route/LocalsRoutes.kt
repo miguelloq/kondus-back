@@ -1,8 +1,8 @@
 package com.example.modules.locals.presenter.route
 
 import com.example.core.models.AuthenticationType
-import com.example.core.models.RequestWrapDto
-import com.example.core.models.catchingHttpAndId
+import com.example.core.presenter.dto.RequestWrapDto
+import com.example.core.presenter.extension.catchingHttpAndId
 import com.example.modules.locals.domain.error.LocalError
 import com.example.modules.locals.domain.usecase.CreateLocalUsecase
 import com.example.modules.locals.presenter.dto.local.request.CreateLocalRequestDto

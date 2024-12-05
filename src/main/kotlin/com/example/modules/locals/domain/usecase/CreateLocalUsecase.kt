@@ -1,6 +1,6 @@
 package com.example.modules.locals.domain.usecase
 
-import com.example.core.models.RequestWrapDto
+import com.example.core.presenter.dto.RequestWrapDto
 import com.example.modules.locals.domain.model.LocalModel
 import com.example.modules.locals.domain.repository.LocalRepository
 import com.example.modules.locals.presenter.dto.local.request.CreateLocalRequestDto
