@@ -1,6 +1,7 @@
 package com.example.modules.locals.domain.usecase
 
 import com.example.core.presenter.dto.RequestWrapDto
+import com.example.modules.locals.domain.error.LocalError
 import com.example.modules.locals.domain.model.HouseModel
 import com.example.modules.locals.domain.model.LocalModel
 import com.example.modules.locals.domain.repository.HouseRepository
@@ -14,7 +15,7 @@ class CreateHouseUsecase(
 ) {
     suspend operator fun invoke(dto: RequestWrapDto<CreateHouseRequestDto>): Long{
         val (request,id) = dto
-        val local = localRepository.get(request.localId)
+        val local = localRepository.get(request.localId) ?: throw LocalError.LocalDontExists
         val house = request.toDomain(local)
         val houseId = houseRepository.create(house,id)
         return houseId

@@ -4,5 +4,5 @@ import com.example.modules.locals.domain.model.LocalModel
 
 interface LocalRepository{
     suspend fun create(model: LocalModel, creatorUserId: Long): Long
-    suspend fun get(localId: Long): LocalModel
+    suspend fun get(localId: Long): LocalModel?
 }
