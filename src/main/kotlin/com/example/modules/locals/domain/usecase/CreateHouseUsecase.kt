@@ -13,11 +13,10 @@ class CreateHouseUsecase(
     private val houseRepository: HouseRepository,
     private val localRepository: LocalRepository
 ) {
-    suspend operator fun invoke(dto: RequestWrapDto<CreateHouseRequestDto>): Long{
-        val (request,id) = dto
-        val local = localRepository.get(request.localId) ?: throw LocalError.LocalDontExists
-        val house = request.toDomain(local)
-        val houseId = houseRepository.create(house,id)
+    suspend operator fun invoke(dto: CreateHouseRequestDto): Long{
+        val local = localRepository.get(dto.localId) ?: throw LocalError.LocalDontExists
+        val house = dto.toDomain(local)
+        val houseId = houseRepository.create(house,dto.localId)
         return houseId
     }
 }
