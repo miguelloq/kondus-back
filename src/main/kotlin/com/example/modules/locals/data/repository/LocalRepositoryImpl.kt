@@ -27,26 +27,28 @@ class LocalRepositoryImpl: LocalRepository {
         id.value.toLong()
     }
 
-    override suspend fun get(localId: Long): LocalModel? = Locals
-        .selectAll()
-        .where{ Locals.id eq localId.toInt()}
-        .fold(emptyList<LocalModel>()){ acc, it ->
-            acc + LocalModel(
-                name = LocalModel.Name(it[Locals.name]),
-                description = LocalModel.Description(it[Locals.description]),
-                address = LocalModel.Address(
-                    street = LocalModel.Address.Street(it[Locals.street]),
-                    cep = LocalModel.Address.Cep(it[Locals.postal].toInt()),
-                    number = LocalModel.Address.Number(it[Locals.number])
-                ),
-                category = when(it[Locals.type]){
-                    "Apartment" -> LocalModel.Category.Condominium
-                    "Condominium" -> LocalModel.Category.Apartment
-                    else -> throw LocalError.InvalidLocalCategory
-                }
-            )
-        }
-        .singleOrNull()
+    override suspend fun get(localId: Long): LocalModel? = suspendTransaction {
+        Locals
+            .selectAll()
+            .where { Locals.id eq localId.toInt() }
+            .map{
+                LocalModel(
+                    name = LocalModel.Name(it[Locals.name]),
+                    description = LocalModel.Description(it[Locals.description]),
+                    address = LocalModel.Address(
+                        street = LocalModel.Address.Street(it[Locals.street]),
+                        cep = LocalModel.Address.Cep(it[Locals.postal].toInt()),
+                        number = LocalModel.Address.Number(it[Locals.number])
+                    ),
+                    category = when (it[Locals.type]) {
+                        "Apartment" -> LocalModel.Category.Condominium
+                        "Condominium" -> LocalModel.Category.Apartment
+                        else -> throw LocalError.InvalidLocalCategory
+                    }
+                )
+            }
+            .singleOrNull()
+    }
 }
 
 private fun LocalModel.Category.fromDatabaseString(s: String) = when(s){
