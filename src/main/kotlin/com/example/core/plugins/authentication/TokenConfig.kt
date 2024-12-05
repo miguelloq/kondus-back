@@ -1,4 +1,4 @@
-package com.example.core.model
+package com.example.core.plugins.authentication
 
 data class TokenConfig(
     val secret: String,
@@ -6,7 +6,3 @@ data class TokenConfig(
     val audience: String,
     val realm:String
 )
-
-
-
-

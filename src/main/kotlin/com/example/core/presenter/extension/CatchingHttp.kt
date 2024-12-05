@@ -1,7 +1,7 @@
 package com.example.core.presenter.extension
 
 import com.example.core.models.CoreUser
-import com.example.core.plugins.getUserId
+import com.example.core.plugins.authentication.getUserId
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.routing.RoutingContext
 import io.ktor.server.response.respond

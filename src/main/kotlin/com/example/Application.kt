@@ -1,6 +1,6 @@
 package com.example
 
-import com.example.core.plugins.configureAuthentication
+import com.example.core.plugins.authentication.configureAuthentication
 import com.example.core.plugins.configureDependencyInjection
 import com.example.core.plugins.configureRouting
 import io.ktor.server.application.*

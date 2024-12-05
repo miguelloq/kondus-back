@@ -1,6 +1,6 @@
 package com.example.modules.locals.presenter.route
 
-import com.example.core.models.AuthenticationType
+import com.example.core.plugins.authentication.AuthenticationType
 import com.example.core.presenter.dto.RequestWrapDto
 import com.example.core.presenter.extension.catchingHttpAndId
 import com.example.modules.locals.domain.error.LocalError

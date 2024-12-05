@@ -1,6 +1,6 @@
 package com.example.modules.users.domain.usecase
 
-import com.example.core.model.TokenConfig
+import com.example.core.plugins.authentication.TokenConfig
 import com.example.modules.users.presenter.dto.LoginRequestDto
 import com.example.modules.users.domain.error.UserError
 import com.example.modules.users.domain.model.UserModel.Email
