@@ -2,15 +2,19 @@ package com.example.modules.locals.presenter.route
 
 import com.example.core.plugins.authentication.AuthenticationType
 import com.example.core.presenter.dto.IdDomainModelWrapDto
+import com.example.core.presenter.dto.RequestWrapDto
 import com.example.core.presenter.extension.catchingHttp
 import com.example.core.presenter.extension.catchingHttpAndId
 import com.example.modules.locals.domain.error.LocalError
 import com.example.modules.locals.domain.model.HouseModel
+import com.example.modules.locals.domain.usecase.AssociateHouseToUserUsecase
 import com.example.modules.locals.domain.usecase.CreateHouseUsecase
 import com.example.modules.locals.domain.usecase.GetAllHousesFromUserUsecase
+import com.example.modules.locals.presenter.dto.house.request.AssociateHouseToUserRequestDto
 import com.example.modules.locals.presenter.dto.house.request.CreateHouseRequestDto
 import com.example.modules.locals.presenter.dto.house.response.CreateHouseResponseDto
 import com.example.modules.locals.presenter.dto.local.response.GetAllHousesFromUserResponseDto
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -24,7 +28,8 @@ import org.koin.ktor.ext.inject
 
 fun Route.housesRoutes(
     createHouseUsecase: CreateHouseUsecase = application.inject<CreateHouseUsecase>().value,
-    getAllHousesFromUserUsecase: GetAllHousesFromUserUsecase = application.inject<GetAllHousesFromUserUsecase>().value
+    getAllHousesFromUserUsecase: GetAllHousesFromUserUsecase = application.inject<GetAllHousesFromUserUsecase>().value,
+    associateHouseToUserUsecase: AssociateHouseToUserUsecase = application.inject<AssociateHouseToUserUsecase>().value
 ) = route("houses"){
 
     authenticate(AuthenticationType.Core.value){
@@ -45,7 +50,14 @@ fun Route.housesRoutes(
             }
         }
 
-        put("/user"){}
+        put("/user"){//Only local owners
+            catchingHttpAndId<LocalError>(){ localOwnerId ->
+                val request = call.receive<AssociateHouseToUserRequestDto>()
+                val wrap = RequestWrapDto(request,localOwnerId)
+                associateHouseToUserUsecase(wrap)
+                call.respond(HttpStatusCode.NoContent)
+            }
+        }
     }
 }
 
