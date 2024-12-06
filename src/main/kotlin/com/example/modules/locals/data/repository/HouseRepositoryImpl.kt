@@ -3,11 +3,18 @@ package com.example.modules.locals.data.repository
 import com.example.core.models.CoreUser
 import com.example.core.plugins.suspendTransaction
 import com.example.core.presenter.dto.IdDomainModelWrapDto
+import com.example.modules.locals.domain.error.LocalError
 import com.example.modules.locals.domain.model.HouseModel
 import com.example.modules.locals.domain.repository.HouseRepository
+import com.example.modules.locals.domain.repository.LocalRepository
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.selectAll
 
-class HouseRepositoryImpl: HouseRepository {
+
+class HouseRepositoryImpl(
+    private val localRepository: LocalRepository
+): HouseRepository {
     override suspend fun create(
         model: HouseModel,
         localId: Long,
@@ -20,7 +27,23 @@ class HouseRepositoryImpl: HouseRepository {
         id.value.toLong()
     }
 
+    //TODO: Demands more tests
     override suspend fun getHousesFromUser(userId: CoreUser.Id): List<IdDomainModelWrapDto<Long, HouseModel>> = suspendTransaction{
-        TODO("Not yet implemented")
+        (Houses leftJoin UsersHouses)
+            .selectAll()
+            .where{
+                UsersHouses.userId.eq(userId.value.toInt()) and
+                        Houses.id.eq(UsersHouses.houseId)
+            }
+            .map{
+                IdDomainModelWrapDto(
+                    id = it[Houses.id].value.toLong(),
+                    domainModel = HouseModel(
+                        name = HouseModel.Name(it[Houses.description]),
+                        local = localRepository.get(it[Houses.localId].toLong())
+                            ?: throw LocalError.LocalDontExists
+                    )
+                )
+            }
     }
 }
