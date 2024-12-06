@@ -1,12 +1,10 @@
 package com.example.modules.locals.domain.usecase
 
-import com.example.core.presenter.dto.RequestWrapDto
 import com.example.modules.locals.domain.error.LocalError
 import com.example.modules.locals.domain.model.HouseModel
 import com.example.modules.locals.domain.model.LocalModel
 import com.example.modules.locals.domain.repository.HouseRepository
 import com.example.modules.locals.domain.repository.LocalRepository
-import com.example.modules.locals.domain.usecase.toDomain
 import com.example.modules.locals.presenter.dto.house.request.CreateHouseRequestDto
 
 class CreateHouseUsecase(

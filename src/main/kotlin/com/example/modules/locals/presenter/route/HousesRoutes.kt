@@ -2,7 +2,7 @@ package com.example.modules.locals.presenter.route
 
 import com.example.core.plugins.authentication.AuthenticationType
 import com.example.core.presenter.dto.IdDomainModelWrapDto
-import com.example.core.presenter.dto.RequestWrapDto
+import com.example.core.presenter.extension.catchingHttp
 import com.example.core.presenter.extension.catchingHttpAndId
 import com.example.modules.locals.domain.error.LocalError
 import com.example.modules.locals.domain.model.HouseModel
@@ -28,17 +28,16 @@ fun Route.housesRoutes(
 ) = route("houses"){
 
     authenticate(AuthenticationType.Core.value){
-        post{
-            catchingHttpAndId<LocalError>(){ id ->
+        post{//Only local owners
+            catchingHttp<LocalError>(){
                 val request = call.receive<CreateHouseRequestDto>()
-                val wrap = RequestWrapDto(request,id)
-                val houseId = createHouseUsecase(wrap)
+                val houseId = createHouseUsecase(request)
                 val response = CreateHouseResponseDto(houseId)
                 call.respond(response)
             }
         }
 
-        get{
+        get{//Only local residents
             catchingHttpAndId<LocalError>(){ id ->
                 val houses = getAllHousesFromUserUsecase(id)
                 val response = houses.map{ it.toResponse() }
