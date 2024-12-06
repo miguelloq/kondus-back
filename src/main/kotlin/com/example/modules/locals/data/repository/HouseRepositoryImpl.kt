@@ -11,7 +11,6 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 
-
 class HouseRepositoryImpl(
     private val localRepository: LocalRepository
 ): HouseRepository {
@@ -45,5 +44,21 @@ class HouseRepositoryImpl(
                     )
                 )
             }
+    }
+
+    override suspend fun associateHouseToUser(userId: CoreUser.Id, houseId: Long) = suspendTransaction(){
+        UsersHouses.insert{
+            it[UsersHouses.userId] = userId.value.toInt()
+            it[UsersHouses.houseId] = houseId.toInt()
+        }
+        Unit
+    }
+
+    override suspend fun getLocalId(houseId: Long): Long? = suspendTransaction(){
+        Houses
+            .select(Houses.id,Houses.localId)
+            .where{ Houses.id eq houseId.toInt() }
+            .singleOrNull()
+            ?.let{ it[Houses.localId].toLong() }
     }
 }

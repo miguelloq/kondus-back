@@ -1,13 +1,12 @@
 package com.example.modules.locals.data.repository
 
+import com.example.core.models.CoreUser
 import com.example.core.plugins.suspendTransaction
 import com.example.modules.locals.domain.error.LocalError
 import com.example.modules.locals.domain.model.LocalModel
 import com.example.modules.locals.domain.repository.LocalRepository
-import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
-import kotlin.collections.get
 
 class LocalRepositoryImpl: LocalRepository {
     override suspend fun create(
@@ -49,12 +48,18 @@ class LocalRepositoryImpl: LocalRepository {
             }
             .singleOrNull()
     }
-}
 
-private fun LocalModel.Category.fromDatabaseString(s: String) = when(s){
-    "Apartment" -> LocalModel.Category.Condominium
-    "Condominium" -> LocalModel.Category.Apartment
-    else -> Exception()
+    override suspend fun userIsLocalOwner(
+        userId: CoreUser.Id,
+        localId: Long
+    ): Boolean = suspendTransaction() {
+        Locals
+            .select(Locals.id,Locals.userId)
+            .where{ Locals.id eq localId.toInt() }
+            .limit(1)
+            .map{ it[Locals.userId] == userId.value.toInt() }
+            .firstOrNull() == true
+    }
 }
 
 private fun LocalModel.Category.toDatabaseString() = when(this){
