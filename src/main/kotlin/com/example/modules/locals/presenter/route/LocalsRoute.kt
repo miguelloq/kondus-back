@@ -16,7 +16,7 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.application
 import org.koin.ktor.ext.inject
 
-fun Route.localsRoutes(
+fun Route.localsRoute(
     createLocalUsecase: CreateLocalUsecase = application.inject<CreateLocalUsecase>().value
 ) = route("locals"){
     authenticate(AuthenticationType.Core.value){
