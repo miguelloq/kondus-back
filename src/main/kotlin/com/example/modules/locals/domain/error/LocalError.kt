@@ -8,4 +8,8 @@ sealed class LocalError(override val message: String): Exception(message)  {
     data object InvalidLocalCategory : LocalError("The chosen local have a invalid type of category.")
 
     data object LocalDontExists: LocalError("The local informed dont exists.")
+
+    data object HouseDontExists: LocalError("The house informed dont exists.")
+
+    data object UserDontOwnLocal: LocalError("User does not won this local.")
 }
