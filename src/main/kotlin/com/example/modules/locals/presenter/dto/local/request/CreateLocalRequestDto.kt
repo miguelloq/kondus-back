@@ -9,6 +9,5 @@ data class CreateLocalRequestDto(
     val cep: Int,
     val name: String,
     val description: String,
-    val category: String,
-    val type: String
+    val category: String
 )
