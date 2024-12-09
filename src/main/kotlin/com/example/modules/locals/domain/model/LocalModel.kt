@@ -21,7 +21,7 @@ data class LocalModel(
     @JvmInline @Serializable value class Description(val s: String){
         init {
             val maximumLength = 50
-            if(s.length>maximumLength) throw LocalError.InvalidField("Name", "the maximum length is $maximumLength.")
+            if(s.length>maximumLength) throw LocalError.InvalidField("Description", "the maximum length is $maximumLength.")
         }
     }
 
