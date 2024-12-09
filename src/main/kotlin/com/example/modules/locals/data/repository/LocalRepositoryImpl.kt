@@ -19,7 +19,7 @@ class LocalRepositoryImpl: LocalRepository {
             it[postal] = model.address.cep.n.toString()
             it[name] = model.name.s
             it[description] = model.description.s
-            it[userId] = userId
+            it[userId] = creatorUserId.toInt()
             it[type] = model.category.toDatabaseString()
         } get Locals.id
 
