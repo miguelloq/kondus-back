@@ -11,5 +11,5 @@ sealed class LocalError(override val message: String): Exception(message)  {
 
     data object HouseDontExists: LocalError("The house informed dont exists.")
 
-    data object UserDontOwnLocal: LocalError("User does not won this local.")
+    data object UserDontOwnLocal: LocalError("User does not own this local.")
 }

@@ -16,7 +16,7 @@ class AssociateHouseToUserUsecase(
         val (houseId, residentId) = request
 
         val localId = houseRepository.getLocalId(request.houseId) ?: throw LocalError.HouseDontExists
-        if(localRepository.userIsLocalOwner(userId,localId)) throw LocalError.UserDontOwnLocal
+        if(!localRepository.userIsLocalOwner(userId,localId)) throw LocalError.UserDontOwnLocal
 
         houseRepository.associateHouseToUser(CoreUser.Id(residentId),houseId)
     }

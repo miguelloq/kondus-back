@@ -10,7 +10,7 @@ data class HouseModel(
 ){
     @Serializable @JvmInline value class Name(val s: String){
         init{
-            val maximumLength = 20
+            val maximumLength = 35
             if(s.isEmpty()) throw LocalError.InvalidField("Name", "cannot be blank.")
             if(s.length>maximumLength) throw LocalError.InvalidField("Name", "the maximum length is $maximumLength.")
         }
