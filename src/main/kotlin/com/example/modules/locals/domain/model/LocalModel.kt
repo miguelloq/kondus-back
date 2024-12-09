@@ -1,6 +1,7 @@
 package com.example.modules.locals.domain.model
 
 import com.example.modules.locals.domain.error.LocalError
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -27,7 +28,10 @@ data class LocalModel(
 
     @Serializable
     sealed interface Category{
+        @Serializable @SerialName("Apartment")
         data object Apartment: Category
+
+        @Serializable @SerialName("Condominium")
         data object Condominium: Category
 
         companion object{
