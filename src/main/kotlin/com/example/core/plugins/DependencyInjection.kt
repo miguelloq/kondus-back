@@ -1,6 +1,7 @@
 package com.example.core.plugins
 
 import com.example.core.coreKoinModule
+import com.example.modules.locals.localKoinModule
 import com.example.modules.users.userKoinModule
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -18,6 +19,7 @@ fun Application.configureDependencyInjection(){
 fun KoinApplication.configureKoinModules(){
     modules(
         coreKoinModule(),
-        userKoinModule()
+        userKoinModule(),
+        localKoinModule(),
     )
 }

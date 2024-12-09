@@ -1,7 +1,8 @@
 package com.example.modules.users.presenter.route
 
-import com.example.core.plugins.getTokenConfig
-import com.example.core.plugins.getUserId
+import com.example.core.plugins.authentication.AuthenticationType
+import com.example.core.plugins.authentication.getTokenConfig
+import com.example.core.plugins.authentication.getUserId
 import com.example.modules.users.presenter.dto.LoginRequestDto
 import com.example.modules.users.presenter.dto.RegisterUserDto
 import com.example.modules.users.domain.usecase.GetAllUserUsecase
@@ -36,7 +37,7 @@ fun Route.usersRoute(
         call.respond(HttpStatusCode.InternalServerError)
     }
 
-    authenticate("core-auth"){
+    authenticate(AuthenticationType.Core.value){
         get(){
             catchingUserError {
                 val users = getAllUserUsecase()
@@ -63,7 +64,7 @@ fun Route.usersRoute(
         }
     }
 
-    authenticate("core-auth"){
+    authenticate(AuthenticationType.Core.value){
         get("id"){
             catchingUserError {
                 val id = getUserId() ?: call.respond(HttpStatusCode.Unauthorized)

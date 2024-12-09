@@ -1,8 +1,9 @@
-package com.example.core.plugins
+package com.example.core.plugins.authentication
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.example.core.model.TokenConfig
+import com.example.core.plugins.authentication.TokenConfig
+import com.example.core.plugins.authentication.AuthenticationType
 import io.ktor.server.application.Application
 import io.ktor.server.auth.authentication
 import io.ktor.server.auth.jwt.JWTPrincipal
@@ -14,7 +15,7 @@ fun Application.configureAuthentication(){
     val tokenConfig = getTokenConfig()
 
     authentication {
-        jwt("core-auth"){
+        jwt(AuthenticationType.Core.value){
             realm = tokenConfig.realm
             verifier(JWT
                 .require(Algorithm.HMAC256(tokenConfig.secret))

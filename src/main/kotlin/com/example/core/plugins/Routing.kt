@@ -1,5 +1,7 @@
 package com.example.core.plugins
 
+import com.example.modules.locals.presenter.route.housesRoutes
+import com.example.modules.locals.presenter.route.localsRoute
 import com.example.modules.users.presenter.route.usersRoute
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
@@ -11,5 +13,7 @@ fun Application.configureRouting(){
     install(ContentNegotiation) { json() }
     routing{
         usersRoute()
+        localsRoute()
+        housesRoutes()
     }
 }

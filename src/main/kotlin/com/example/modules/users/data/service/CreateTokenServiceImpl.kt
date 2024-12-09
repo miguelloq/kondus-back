@@ -2,7 +2,7 @@ package com.example.modules.users.data.service
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.example.core.model.TokenConfig
+import com.example.core.plugins.authentication.TokenConfig
 import com.example.modules.users.domain.service.CreateTokenService
 import java.util.Date
 

@@ -24,5 +24,5 @@ fun Application.configureDatabase(){
     flyway.migrate()
 }
 
-suspend fun <T> suspendTransaction(block: Transaction.() -> T): T =
+suspend fun <T> suspendTransaction(block: suspend Transaction.() -> T): T =
     newSuspendedTransaction(Dispatchers.IO, statement = block)
