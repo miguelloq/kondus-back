@@ -8,6 +8,7 @@ data class UserModel(
     val name: Name,
     val email: Email,
     val password: Password,
+    val houseId: Int
 ){
     @JvmInline @Serializable
     value class Name(val value: String){

@@ -15,6 +15,7 @@ class UserRepositoryImpl(): UserRepository {
             name = userModel.name.value
             email = userModel.email.value
             password = userModel.password.value
+            houseId = userModel.houseId
         }
     }
 
@@ -46,5 +47,6 @@ class UserRepositoryImpl(): UserRepository {
 private fun UserEntity.toModel() = UserModel(
     email = Email(email),
     name = Name(name),
-    password = Password(password)
+    password = Password(password),
+    houseId = houseId
 )

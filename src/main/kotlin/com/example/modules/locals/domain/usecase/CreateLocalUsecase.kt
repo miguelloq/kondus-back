@@ -8,10 +8,9 @@ import com.example.modules.locals.presenter.dto.local.request.CreateLocalRequest
 class CreateLocalUsecase(
     private val repository: LocalRepository
 ) {
-    suspend operator fun invoke(dto: RequestWrapDto<CreateLocalRequestDto>): Long{
-        val (response,userId) = dto
-        val model = response.toDomain()
-        val id = repository.create(model,userId.value)
+    suspend operator fun invoke(dto: CreateLocalRequestDto): Long{
+        val model = dto.toDomain()
+        val id = repository.create(model)
         return id
     }
 }

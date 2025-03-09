@@ -23,8 +23,7 @@ fun Route.localsRoute(
         post{
             catchingHttpAndId<LocalError>(){ id ->
                 val request = call.receive<CreateLocalRequestDto>()
-                val wrap = RequestWrapDto(request,id)
-                val id = createLocalUsecase(wrap)
+                val id = createLocalUsecase(request)
                 call.respond(CreateLocalResponseDto(id))
             }
         }

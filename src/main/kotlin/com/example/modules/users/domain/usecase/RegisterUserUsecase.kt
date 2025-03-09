@@ -20,5 +20,6 @@ class RegisterUserUsecase(val userRepo: UserRepository) {
 private fun RegisterUserDto.toModel() = UserModel(
     name = Name(name),
     email = Email(email),
-    password = Password(password)
+    password = Password(password),
+    houseId = houseId
 )
