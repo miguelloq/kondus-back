@@ -87,7 +87,7 @@ suspend inline fun <reified T: Exception> RoutingContext.catchingHttp(
     val message = err.message
     when (err) {
         is T if(onCatchT != null) -> onCatchT(err)
-        is T if(message != null) -> call.respond(HttpStatusCode.BadRequest, message)
+        is T if(message != null) -> call.respond(HttpStatusCode.BadRequest, hashMapOf("message" to message))
         else -> call.respond(HttpStatusCode.InternalServerError).also{ err.printStackTrace() }
     }
 }
