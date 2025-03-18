@@ -35,4 +35,17 @@ class HouseRepositoryImpl(
             .singleOrNull()
             ?.let{ it[Houses.localId].toLong() }
     }
+
+    override suspend fun get(houseId: Long): HouseModel? = suspendTransaction{
+        Houses
+            .selectAll()
+            .where { Houses.id eq houseId.toInt() }
+            .map{
+                HouseModel(
+                    name = HouseModel.Name(it[Houses.description]),
+                    local = localRepository.get(it[Houses.localId].toLong()) ?: return@suspendTransaction  null
+                )
+            }
+            .singleOrNull()
+    }
 }

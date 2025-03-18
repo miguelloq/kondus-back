@@ -1,5 +1,7 @@
 package com.example.modules.users
 
+import com.example.modules.locals.data.repository.LocalRepositoryImpl
+import com.example.modules.locals.domain.repository.LocalRepository
 import com.example.modules.users.data.repository.UserRepositoryFake
 import com.example.modules.users.data.repository.UserRepositoryImpl
 import com.example.modules.users.data.service.CreateTokenServiceImpl
@@ -15,7 +17,8 @@ fun KoinApplication.userKoinModule() = module{
     single<UserRepository>{ UserRepositoryImpl() }
     //single<UserRepository>{ UserRepositoryFake() }
     single<CreateTokenService>{ CreateTokenServiceImpl() }
-    single{ RegisterUserUsecase(get()) }
+    single<LocalRepository>{ LocalRepositoryImpl() }
+    single{ RegisterUserUsecase(get(),get()) }
     single{ GetAllUserUsecase(get()) }
     single{ LoginUserUsecase(get(),get()) }
 }

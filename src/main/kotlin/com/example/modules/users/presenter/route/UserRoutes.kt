@@ -3,6 +3,7 @@ package com.example.modules.users.presenter.route
 import com.example.core.plugins.authentication.AuthenticationType
 import com.example.core.plugins.authentication.getTokenConfig
 import com.example.core.plugins.authentication.getUserId
+import com.example.core.presenter.extension.catchingHttp
 import com.example.modules.users.presenter.dto.LoginRequestDto
 import com.example.modules.users.presenter.dto.RegisterUserDto
 import com.example.modules.users.domain.usecase.GetAllUserUsecase
@@ -12,6 +13,7 @@ import com.example.modules.users.domain.error.UserError
 import com.example.modules.users.domain.model.UserModel
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
+import io.ktor.server.request.ContentTransformationException
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
@@ -31,15 +33,15 @@ fun Route.usersRoute(
 
     suspend fun RoutingContext.catchingUserError(block: suspend RoutingContext.()->Unit) = try{
         block()
-    }catch(userErr: UserError){
-        call.respond(HttpStatusCode.BadRequest,userErr.message)
-    }catch (_: Exception){
+    }catch(userErr: UserError) {
+        call.respond(HttpStatusCode.BadRequest, userErr.message)
+    }catch (e: Exception){
         call.respond(HttpStatusCode.InternalServerError)
     }
 
     authenticate(AuthenticationType.Core.value){
         get(){
-            catchingUserError {
+            catchingHttp<UserError> {
                 val users = getAllUserUsecase()
                 val response = users.map{ it.toGetAllUser() }
                 call.respond(response)
@@ -48,7 +50,7 @@ fun Route.usersRoute(
     }
 
     get("login"){
-        catchingUserError {
+        catchingHttp<UserError> {
             val tokenConfig = application.getTokenConfig()
             val dto = call.receive<LoginRequestDto>()
             val token = loginUserUsecase(tokenConfig, dto)
@@ -57,7 +59,7 @@ fun Route.usersRoute(
     }
 
     post{
-        catchingUserError {
+        catchingHttp<UserError>{
             val dto = call.receive<RegisterUserDto>()
             registerUserUsecase(dto)
             call.respond(HttpStatusCode.NoContent)
@@ -66,7 +68,7 @@ fun Route.usersRoute(
 
     authenticate(AuthenticationType.Core.value){
         get("id"){
-            catchingUserError {
+            catchingHttp<UserError> {
                 val id = getUserId() ?: call.respond(HttpStatusCode.Unauthorized)
                 call.respond(id)
             }

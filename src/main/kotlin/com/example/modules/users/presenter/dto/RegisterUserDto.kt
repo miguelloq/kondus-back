@@ -7,5 +7,5 @@ data class RegisterUserDto(
     val name: String,
     val email: String,
     val password: String,
-    val houseId: Int
+    val houseId: Long
 )
