@@ -7,6 +7,8 @@ import com.example.modules.locals.domain.error.LocalError
 import com.example.modules.locals.domain.model.HouseModel
 import com.example.modules.locals.domain.repository.HouseRepository
 import com.example.modules.locals.domain.repository.LocalRepository
+import com.example.modules.users.data.repository.UserEntity
+import com.example.modules.users.data.repository.UserTable
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
@@ -26,39 +28,24 @@ class HouseRepositoryImpl(
         id.value.toLong()
     }
 
-    //TODO: Demands more tests
-    override suspend fun getHousesFromUser(userId: CoreUser.Id): List<IdDomainModelWrapDto<Long, HouseModel>> = suspendTransaction{
-        (Houses leftJoin UsersHouses)
-            .selectAll()
-            .where{
-                UsersHouses.userId.eq(userId.value.toInt()) and
-                        Houses.id.eq(UsersHouses.houseId)
-            }
-            .map{
-                IdDomainModelWrapDto(
-                    id = it[Houses.id].value.toLong(),
-                    domainModel = HouseModel(
-                        name = HouseModel.Name(it[Houses.description]),
-                        local = localRepository.get(it[Houses.localId].toLong())
-                            ?: throw LocalError.LocalDontExists
-                    )
-                )
-            }
-    }
-
-    override suspend fun associateHouseToUser(userId: CoreUser.Id, houseId: Long) = suspendTransaction(){
-        UsersHouses.insert{
-            it[UsersHouses.userId] = userId.value.toInt()
-            it[UsersHouses.houseId] = houseId.toInt()
-        }
-        Unit
-    }
-
     override suspend fun getLocalId(houseId: Long): Long? = suspendTransaction(){
         Houses
             .select(Houses.id,Houses.localId)
             .where{ Houses.id eq houseId.toInt() }
             .singleOrNull()
             ?.let{ it[Houses.localId].toLong() }
+    }
+
+    override suspend fun get(houseId: Long): HouseModel? = suspendTransaction{
+        Houses
+            .selectAll()
+            .where { Houses.id eq houseId.toInt() }
+            .map{
+                HouseModel(
+                    name = HouseModel.Name(it[Houses.description]),
+                    local = localRepository.get(it[Houses.localId].toLong()) ?: return@suspendTransaction  null
+                )
+            }
+            .singleOrNull()
     }
 }

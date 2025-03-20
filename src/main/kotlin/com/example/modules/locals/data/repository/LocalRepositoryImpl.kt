@@ -11,7 +11,6 @@ import org.jetbrains.exposed.sql.selectAll
 class LocalRepositoryImpl: LocalRepository {
     override suspend fun create(
         model: LocalModel,
-        creatorUserId: Long
     ): Long = suspendTransaction{
         val id = Locals.insert{
             it[street] = model.address.street.s
@@ -19,7 +18,6 @@ class LocalRepositoryImpl: LocalRepository {
             it[postal] = model.address.cep.n.toString()
             it[name] = model.name.s
             it[description] = model.description.s
-            it[userId] = creatorUserId.toInt()
             it[type] = model.category.toDatabaseString()
         } get Locals.id
 
@@ -47,18 +45,6 @@ class LocalRepositoryImpl: LocalRepository {
                 )
             }
             .singleOrNull()
-    }
-
-    override suspend fun userIsLocalOwner(
-        userId: CoreUser.Id,
-        localId: Long
-    ): Boolean = suspendTransaction() {
-        Locals
-            .select(Locals.id,Locals.userId)
-            .where{ Locals.id eq localId.toInt() }
-            .limit(1)
-            .map{ it[Locals.userId] == userId.value.toInt() }
-            .firstOrNull() == true
     }
 }
 
