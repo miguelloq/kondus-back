@@ -4,7 +4,6 @@ CREATE TABLE items (
     description TEXT NOT NULL,
     type VARCHAR(20) CHECK (type IN ('product', 'service')) NOT NULL,
     price NUMERIC(10,2),
-    unit VARCHAR(50), -- Exemplo: "hora", "unidade", "peça"
     quantity INTEGER CHECK (quantity >= 0),
     available BOOLEAN,
     user_id SERIAL NOT NULL,
