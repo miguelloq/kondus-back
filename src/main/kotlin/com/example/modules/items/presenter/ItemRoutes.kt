@@ -24,7 +24,7 @@ fun Route.itemRoutes(
     itemRepository: ItemRepository = application.inject<ItemRepository>().value
 ) = route("/items"){
     authenticate(AuthenticationType.Core.value) {
-        get{ //NOT TESTED
+        get{
             catchingHttpAndId<ItemError> { id ->
                 val finder = call.receive<ItemFinderDto>()
                 itemRepository
