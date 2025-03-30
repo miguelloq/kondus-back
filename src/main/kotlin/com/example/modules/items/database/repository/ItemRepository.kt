@@ -78,7 +78,7 @@ class ItemRepository {
 
         ItemEntity.find {
             Items.user inList allUsersFromUserLocal and
-                    (finder.search?.let { Items.title.like("%$it%") } ?: Op.TRUE)
+                    (finder.search?.let { Items.title.upperCase().like("%${it.uppercase()}%") } ?: Op.TRUE)
         }
     }
 
