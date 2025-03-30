@@ -1,7 +1,7 @@
 package com.example.modules.items.database.repository
 
-import com.example.core.data.repository.CoreUserTable
 import com.example.modules.users.data.repository.UserEntity
+import com.example.modules.users.data.repository.UserTable
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -14,8 +14,7 @@ object Items : IntIdTable("items") {
     val type = varchar("type", 20)
     val price = decimal("price", 10, 2).nullable()
     val quantity = integer("quantity").nullable()
-    val available = bool("available").default(true)
-    val user = reference("user_id", CoreUserTable.userId, onDelete = ReferenceOption.CASCADE)
+    val user = reference("user_id", UserTable.id, onDelete = ReferenceOption.CASCADE)
 }
 
 class ItemEntity(id: EntityID<Int>) : IntEntity(id) {
@@ -26,7 +25,6 @@ class ItemEntity(id: EntityID<Int>) : IntEntity(id) {
     var type by Items.type
     var price by Items.price
     var quantity by Items.quantity
-    var available by Items.available
     var user by UserEntity referencedOn Items.user
     var categories by CategoryEntity via ItemCategories
 }
