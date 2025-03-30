@@ -1,6 +1,7 @@
 package com.example.core.plugins
 
 import com.example.core.coreKoinModule
+import com.example.modules.items.itemKoinModule
 import com.example.modules.locals.localKoinModule
 import com.example.modules.users.userKoinModule
 import io.ktor.server.application.Application
@@ -21,5 +22,6 @@ fun KoinApplication.configureKoinModules(){
         coreKoinModule(),
         userKoinModule(),
         localKoinModule(),
+        itemKoinModule()
     )
 }
