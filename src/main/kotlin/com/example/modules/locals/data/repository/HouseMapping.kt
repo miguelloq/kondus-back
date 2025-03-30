@@ -17,4 +17,5 @@ class HouseEntity(id: EntityID<Int>) : IntEntity(id) {
 
     var localId by Houses.localId
     var description by Houses.description
+    var local by LocalEntity referencedOn Houses.localId
 }
