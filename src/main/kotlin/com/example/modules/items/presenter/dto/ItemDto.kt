@@ -18,7 +18,7 @@ data class CreateItemDto(
     val type: String,
     val price: Double,
     val quantity: Int,
-    val categories: List<Int>
+    val categoriesIds: List<Int>
 ){
     init{
         if(type != "produto" && type != "serviço") throw ItemError.InvalidField("Type","can only be produto or serviço")

@@ -39,7 +39,7 @@ class ItemRepository {
             price = item.price.toBigDecimal()
             quantity = item.quantity
             user = userEntity
-            categories = SizedCollection(item.categories.mapNotNull {
+            categories = SizedCollection(item.categoriesIds.mapNotNull {
                 CategoryEntity.find { Categories.id eq it }.firstOrNull()
             })
         }
