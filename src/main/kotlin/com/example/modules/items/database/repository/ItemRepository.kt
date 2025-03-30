@@ -36,7 +36,7 @@ class ItemRepository {
             title = item.title
             description = item.description
             type = item.type
-            price = item.price.toBigDecimal()
+            price = item.price?.toBigDecimal()
             quantity = item.quantity
             user = userEntity
             categories = SizedCollection(item.categoriesIds.mapNotNull {

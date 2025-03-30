@@ -16,14 +16,14 @@ data class CreateItemDto(
     val title: String,
     val description: String,
     val type: String,
-    val price: Double,
-    val quantity: Int,
+    val price: Double?,
+    val quantity: Int?,
     val categoriesIds: List<Int>
 ){
     init{
         if(type != "produto" && type != "serviço") throw ItemError.InvalidField("Type","can only be produto or serviço")
-        if(0.01 > price) throw ItemError.InvalidField("Price","cannot be less than 0.01")
-        if(0 > quantity) throw ItemError.InvalidField("Quantity","cannot be less than 1")
+        if(price!= null && 0.01 > price) throw ItemError.InvalidField("Price","cannot be less than 0.01")
+        if(quantity!=null && 0 > quantity) throw ItemError.InvalidField("Quantity","cannot be less than 1")
         if(title.length > 254) throw ItemError.InvalidField("Title length","cannot be more than 254 characters")
     }
 }
@@ -34,8 +34,8 @@ data class ItemDto(
     val title: String,
     val description: String,
     val type: String,
-    val price: Double,
-    val quantity: Int,
+    val price: Double?,
+    val quantity: Int?,
     val categories: List<CategoryDto>
 )
 
@@ -56,8 +56,8 @@ fun ItemEntity.toItemDto() = ItemDto(
     title = title,
     description = description,
     type = type,
-    price = price?.toDouble() ?: 0.0,
-    quantity = quantity ?: 0,
+    price = price?.toDouble(),
+    quantity = quantity,
     categories = categories.map{ it.toCategoryDto() }
 )
 
