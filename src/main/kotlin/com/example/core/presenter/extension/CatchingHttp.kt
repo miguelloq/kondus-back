@@ -1,5 +1,6 @@
 package com.example.core.presenter.extension
 
+import com.example.core.error.NotFoundError
 import com.example.core.models.CoreUser
 import com.example.core.plugins.authentication.getUserId
 import io.ktor.http.HttpStatusCode
@@ -87,6 +88,7 @@ suspend inline fun <reified T: Exception> RoutingContext.catchingHttp(
     val message = err.message
     when (err) {
         is T if(onCatchT != null) -> onCatchT(err)
+        is T if err is NotFoundError -> call.respond(HttpStatusCode.NotFound, hashMapOf("message" to message))
         is T if(message != null) -> call.respond(HttpStatusCode.BadRequest, hashMapOf("message" to message))
         else -> call.respond(HttpStatusCode.InternalServerError).also{ err.printStackTrace() }
     }
