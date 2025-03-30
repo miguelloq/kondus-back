@@ -2,10 +2,9 @@ CREATE TABLE items (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
-    type VARCHAR(20) CHECK (type IN ('product', 'service')) NOT NULL,
+    type VARCHAR(20) CHECK (type IN ('produto', 'serviço')) NOT NULL,
     price NUMERIC(10,2),
     quantity INTEGER CHECK (quantity >= 0),
-    available BOOLEAN,
     user_id SERIAL NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
