@@ -16,7 +16,8 @@ import com.example.modules.locals.data.repository.Houses
 import com.example.modules.users.data.repository.UserEntity
 import com.example.modules.users.data.repository.UserTable
 import org.jetbrains.exposed.sql.SizedCollection
-import kotlin.math.log
+import org.jetbrains.exposed.sql.SizedIterable
+import org.jetbrains.exposed.sql.*
 
 class ItemRepository {
     private suspend fun CoreUser.Id.toEntity() = suspendTransaction {
@@ -61,16 +62,40 @@ class ItemRepository {
         item.delete()
     }
 
-    suspend fun getByFinder(loggedUser: CoreUser.Id, finder: ItemFinderDto): List<ItemUserDto> = suspendTransaction {
-        val userLocal = loggedUser.toEntity().house.local
+    private suspend fun allItemsFromUserLocal(userId: CoreUser.Id, finder: ItemFinderDto): SizedIterable<ItemEntity> = suspendTransaction{
+        val userLocal = userId.toEntity().house.local
 
-        val allHouseIdsFromUserLocal = HouseEntity.find { Houses.localId eq userLocal.id.value }.map{ it.id.value }
+        val allHouseIdsFromUserLocal = HouseEntity
+            .find { Houses.localId eq userLocal.id.value }
+            .map{ it.id.value }
+
         val allUsersFromUserLocal = UserEntity
-            .find { UserTable.houseId inList allHouseIdsFromUserLocal }.map { it.id.value }
+            .find { UserTable.houseId inList allHouseIdsFromUserLocal }
+            .mapNotNull {
+                if(it.id.value == userId.value.toInt()) null
+                else it.id.value
+            }
 
-        val allItemsFromUserLocal = ItemEntity
-            .find { Items.user inList allUsersFromUserLocal }
-        //TODO Depois tem que usar o finder aqui
+        ItemEntity.find {
+            Items.user inList allUsersFromUserLocal and
+                    (finder.search?.let { Items.title.like("%$it%") } ?: Op.TRUE)
+        }
+    }
+
+    suspend fun getByFinder(loggedUser: CoreUser.Id, finder: ItemFinderDto): List<ItemUserDto> = suspendTransaction {
+        fun `items with types on finder`(itemEntity: ItemEntity): Boolean =
+            if(finder.types.isEmpty()) true
+            else finder.types.any{ it == itemEntity.type }
+        fun `items with categories on finder`(itemEntity: ItemEntity): Boolean{
+            if(finder.categoriesIds.isEmpty()) return true
+            val categoriesId = itemEntity.categories.map { it.id.value }.toHashSet()
+            return finder.categoriesIds.any{ it in categoriesId }
+        }
+
+        val allItemsFromUserLocal = allItemsFromUserLocal(loggedUser,finder)
+            .filter(::`items with types on finder`)
+            .filter(::`items with categories on finder`)
+
         allItemsFromUserLocal.map { it.toItemUserDto() }
     }
 }
