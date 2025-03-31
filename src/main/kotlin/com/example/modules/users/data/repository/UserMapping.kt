@@ -1,5 +1,6 @@
 package com.example.modules.users.data.repository
 
+import com.example.modules.locals.data.repository.HouseEntity
 import com.example.modules.locals.data.repository.Houses
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
@@ -21,4 +22,5 @@ class UserEntity(id: EntityID<Int>): IntEntity(id){
     var password by UserTable.password
     var email by UserTable.email
     var houseId by UserTable.houseId
+    var house by HouseEntity referencedOn UserTable.houseId
 }

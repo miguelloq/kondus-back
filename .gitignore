@@ -34,3 +34,9 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# Ignora tudo dentro de images/items
+images/items/*
+# Exceto o arquivo mock.txt
+!images/items/mock.txt
+

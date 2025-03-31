@@ -30,15 +30,6 @@ fun Route.usersRoute(
     registerUserUsecase: RegisterUserUsecase = application.inject<RegisterUserUsecase>().value,
     loginUserUsecase: LoginUserUsecase  = application.inject<LoginUserUsecase>().value
 ) = route("/users"){
-
-    suspend fun RoutingContext.catchingUserError(block: suspend RoutingContext.()->Unit) = try{
-        block()
-    }catch(userErr: UserError) {
-        call.respond(HttpStatusCode.BadRequest, userErr.message)
-    }catch (e: Exception){
-        call.respond(HttpStatusCode.InternalServerError)
-    }
-
     authenticate(AuthenticationType.Core.value){
         get(){
             catchingHttp<UserError> {
