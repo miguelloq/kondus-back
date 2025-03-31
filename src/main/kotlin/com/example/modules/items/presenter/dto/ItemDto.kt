@@ -21,7 +21,7 @@ data class CreateItemDto(
     val categoriesIds: List<Int>
 ){
     init{
-        if(type != "produto" && type != "serviço") throw ItemError.InvalidField("Type","can only be produto or serviço")
+        if(type != "produto" && type != "serviço" && type != "aluguel") throw ItemError.InvalidField("Type","can only be produto or serviço")
         if(price!= null && 0.01 > price) throw ItemError.InvalidField("Price","cannot be less than 0.01")
         if(quantity!=null && 0 > quantity) throw ItemError.InvalidField("Quantity","cannot be less than 1")
         if(title.length > 254) throw ItemError.InvalidField("Title length","cannot be more than 254 characters")

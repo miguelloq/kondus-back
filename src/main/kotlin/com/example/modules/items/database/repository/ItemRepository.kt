@@ -3,6 +3,7 @@ package com.example.modules.items.database.repository
 import com.example.core.models.CoreUser
 import com.example.core.plugins.suspendTransaction
 import com.example.modules.items.domain.ItemError
+import com.example.modules.items.domain.toItemTypeEnum
 import com.example.modules.items.presenter.dto.CategoryDto
 import com.example.modules.items.presenter.dto.CreateItemDto
 import com.example.modules.items.presenter.dto.ItemDto
@@ -108,7 +109,9 @@ class ItemRepository {
     suspend fun getByFinder(loggedUser: CoreUser.Id, finder: ItemFinderDto): List<ItemUserDto> = suspendTransaction {
         fun `items with types on finder`(itemEntity: ItemEntity): Boolean =
             if(finder.types.isEmpty()) true
-            else finder.types.any{ it == itemEntity.type }
+            else finder.types
+                .map { it.toItemTypeEnum { throw ItemError.InvalidField("Type", "can only be produto or serviço or aluguel") } }
+                .any{ it == itemEntity.itemTypeEnum }
         fun `items with categories on finder`(itemEntity: ItemEntity): Boolean{
             if(finder.categoriesIds.isEmpty()) return true
             val categoriesId = itemEntity.categories.map { it.id.value }.toHashSet()

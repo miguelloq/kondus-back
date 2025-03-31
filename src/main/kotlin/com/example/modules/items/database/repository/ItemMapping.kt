@@ -1,5 +1,6 @@
 package com.example.modules.items.database.repository
 
+import com.example.modules.items.domain.ItemTypeEnum
 import com.example.modules.users.data.repository.UserEntity
 import com.example.modules.users.data.repository.UserTable
 import org.jetbrains.exposed.dao.IntEntity
@@ -29,4 +30,10 @@ class ItemEntity(id: EntityID<Int>) : IntEntity(id) {
     var categories by CategoryEntity via ItemCategories
     val images: List<ItemImageEntity>
         get() = ItemImageEntity.find { ItemImages.item eq id }.toList()
+    val itemTypeEnum: ItemTypeEnum get() = when{
+        type == "produto" && quantity == 0 -> ItemTypeEnum.Loan
+        type == "produto" -> ItemTypeEnum.Product
+        type == "serviço" -> ItemTypeEnum.Service
+        else -> ItemTypeEnum.Product
+    }
 }
