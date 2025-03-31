@@ -7,20 +7,20 @@ import com.example.modules.users.presenter.route.usersRoute
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
+import io.ktor.server.http.content.staticResources
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.routing
 import kotlinx.serialization.json.Json
 
 fun Application.configureRouting(){
-    install(ContentNegotiation) { json(
-        Json{
-            ignoreUnknownKeys = true
-        }
-    ) }
+    install(ContentNegotiation) {
+        json( Json{ ignoreUnknownKeys = true } )
+    }
     routing{
         usersRoute()
         localsRoute()
         housesRoutes()
         itemRoutes()
+        staticResources("/images","images")
     }
 }
