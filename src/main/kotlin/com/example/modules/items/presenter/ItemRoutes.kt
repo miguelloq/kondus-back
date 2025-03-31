@@ -16,6 +16,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
 import io.ktor.http.content.streamProvider
+import io.ktor.server.http.content.staticFiles
 import io.ktor.server.http.content.staticResources
 import io.ktor.server.request.receive
 import io.ktor.server.request.receiveMultipart
@@ -28,6 +29,7 @@ import kotlinx.io.readByteArray
 import org.koin.ktor.ext.inject
 import java.io.File
 import java.nio.file.Paths
+import java.security.SecureRandom
 
 fun Route.itemRoutes(
     itemRepository: ItemRepository = application.inject<ItemRepository>().value
@@ -76,7 +78,7 @@ fun Route.itemRoutes(
                 call.respond(HttpStatusCode.Created,itemId)
             }
         }
-        staticResources("/images","items")
+        staticFiles("/images",File("images/items"))
         post("/images"){
             catchingHttpAndId<ItemError> { id ->
                 var itemId: Int? = null
@@ -94,11 +96,16 @@ fun Route.itemRoutes(
                     }
                     part.dispose()
                 }
-                images.forEach { (bytes,name) ->
-                    val imagePath = Paths.get("src/main/resources/items", name)
+                val itemEntity = itemRepository.validateImages(id,itemId)
+                val imageNames = images.map { (bytes,name) ->
+                    val cryptoName = generateSecureRandomString(15) + "-" + name
+                    val imagePath = Paths.get("images/items", cryptoName)
                     val imagem = File(imagePath.toUri())
                     imagem.writeBytes(bytes)
+                    cryptoName
                 }
+                itemRepository.updateImages(itemEntity,imageNames)
+                call.respond(HttpStatusCode.Created)
             }
         }
         delete("/{id}") {
@@ -119,4 +126,12 @@ private fun PartData.FileItem.isImage(): Boolean{
         "image/png", "image/jpeg", "image/jpg", "image/gif" -> true
         else -> false
     }
+}
+
+private fun generateSecureRandomString(length: Int): String {
+    val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&()-_=+"
+    val secureRandom = SecureRandom()
+    return (1..length)
+        .map { chars[secureRandom.nextInt(chars.length)] }
+        .joinToString("")
 }

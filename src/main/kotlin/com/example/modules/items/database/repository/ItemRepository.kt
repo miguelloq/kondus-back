@@ -45,6 +45,28 @@ class ItemRepository {
         }
         entity.id.value
     }
+
+    suspend fun validateImages(
+        loggedUser: CoreUser.Id,
+        itemId: Int?
+    ): ItemEntity = suspendTransaction{
+        val itemEntity = ItemEntity
+            .find { Items.id eq (itemId ?: throw ItemError.InvalidField("Item","is obrigatory.")) }
+            .firstOrNull() ?: throw ItemError.NotFound("Item")
+
+        if(itemEntity.user.id.value != loggedUser.value.toInt()) throw ItemError.ActionNotPermitted
+        itemEntity
+    }
+
+    suspend fun updateImages(itemEntity: ItemEntity,imagePaths: List<String>) = suspendTransaction{
+        imagePaths.map {
+            ItemImageEntity.new {
+                item = itemEntity
+                imagePath = it
+            }
+        }
+    }
+
     suspend fun getCategories(): List<CategoryDto> = suspendTransaction {
         CategoryEntity
             .all()

@@ -36,7 +36,8 @@ data class ItemDto(
     val type: String,
     val price: Double?,
     val quantity: Int?,
-    val categories: List<CategoryDto>
+    val categories: List<CategoryDto>,
+    val imagesPaths: List<String>
 )
 
 @Serializable
@@ -58,7 +59,8 @@ fun ItemEntity.toItemDto() = ItemDto(
     type = type,
     price = price?.toDouble(),
     quantity = quantity,
-    categories = categories.map{ it.toCategoryDto() }
+    categories = categories.map { it.toCategoryDto() },
+    imagesPaths = images.map { it.imagePath } ,
 )
 
 fun CategoryEntity.toCategoryDto() = CategoryDto(
