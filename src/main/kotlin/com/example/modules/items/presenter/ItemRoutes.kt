@@ -13,12 +13,21 @@ import com.example.modules.items.presenter.dto.CreateItemDto
 import com.example.modules.items.presenter.dto.ItemDto
 import com.example.modules.items.presenter.dto.ItemFinderDto
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.content.PartData
+import io.ktor.http.content.forEachPart
+import io.ktor.http.content.streamProvider
+import io.ktor.server.http.content.staticResources
 import io.ktor.server.request.receive
+import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
 import io.ktor.server.routing.application
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.post
+import io.ktor.utils.io.readBuffer
+import kotlinx.io.readByteArray
 import org.koin.ktor.ext.inject
+import java.io.File
+import java.nio.file.Paths
 
 fun Route.itemRoutes(
     itemRepository: ItemRepository = application.inject<ItemRepository>().value
@@ -63,8 +72,33 @@ fun Route.itemRoutes(
         post{
             catchingHttpAndId<ItemError> { id ->
                 val item = call.receive<CreateItemDto>()
-                itemRepository.create(id,item)
-                call.respond(HttpStatusCode.Created)
+                val itemId = itemRepository.create(id,item)
+                call.respond(HttpStatusCode.Created,itemId)
+            }
+        }
+        staticResources("/images","items")
+        post("/images"){
+            catchingHttpAndId<ItemError> { id ->
+                var itemId: Int? = null
+                val images = mutableListOf<Pair<ByteArray,String?>>()
+                call.receiveMultipart().forEachPart { part ->
+                    when(part){
+                        is PartData.FormItem if(part.name=="itemId") -> itemId = part.value.toIntOrNull()
+                        is PartData.FileItem if(part.name=="image") -> {
+                            if(!part.isImage()) throw ItemError.InvalidField("Image","is not a image")
+                            val fileBytes = part.provider().readBuffer().readByteArray()
+                            val fileName =  part.originalFileName
+                            images.add(fileBytes to fileName)
+                        }
+                        else -> Unit
+                    }
+                    part.dispose()
+                }
+                images.forEach { (bytes,name) ->
+                    val imagePath = Paths.get("src/main/resources/items", name)
+                    val imagem = File(imagePath.toUri())
+                    imagem.writeBytes(bytes)
+                }
             }
         }
         delete("/{id}") {
@@ -76,5 +110,13 @@ fun Route.itemRoutes(
                 call.respond(HttpStatusCode.OK)
             }
         }
+    }
+}
+
+private fun PartData.FileItem.isImage(): Boolean{
+    val contentType = contentType?.withoutParameters()?.toString()
+    return when (contentType) {
+        "image/png", "image/jpeg", "image/jpg", "image/gif" -> true
+        else -> false
     }
 }

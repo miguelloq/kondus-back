@@ -21,6 +21,5 @@ fun Application.configureRouting(){
         localsRoute()
         housesRoutes()
         itemRoutes()
-        staticResources("/images","images")
     }
 }

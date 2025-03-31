@@ -30,9 +30,9 @@ class ItemRepository {
         item.toItemUserDto()
     }
 
-    suspend fun create(loggedUser: CoreUser.Id, item: CreateItemDto) = suspendTransaction {
+    suspend fun create(loggedUser: CoreUser.Id, item: CreateItemDto): Int = suspendTransaction {
         val userEntity = loggedUser.toEntity()
-        ItemEntity.new {
+        val entity = ItemEntity.new {
             title = item.title
             description = item.description
             type = item.type
@@ -43,6 +43,7 @@ class ItemRepository {
                 CategoryEntity.find { Categories.id eq it }.firstOrNull()
             })
         }
+        entity.id.value
     }
     suspend fun getCategories(): List<CategoryDto> = suspendTransaction {
         CategoryEntity

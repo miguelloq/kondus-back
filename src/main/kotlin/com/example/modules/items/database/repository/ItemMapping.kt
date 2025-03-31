@@ -27,4 +27,6 @@ class ItemEntity(id: EntityID<Int>) : IntEntity(id) {
     var quantity by Items.quantity
     var user by UserEntity referencedOn Items.user
     var categories by CategoryEntity via ItemCategories
+    val images: List<ItemImageEntity>
+        get() = ItemImageEntity.find { ItemImages.item eq id }.toList()
 }
