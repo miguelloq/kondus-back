@@ -40,3 +40,4 @@ images/items/*
 # Exceto o arquivo mock.txt
 !images/items/mock.txt
 
+tmp/
