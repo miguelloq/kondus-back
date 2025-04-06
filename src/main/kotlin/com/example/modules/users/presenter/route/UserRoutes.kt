@@ -7,18 +7,15 @@ import com.example.core.plugins.authentication.getUserId
 import com.example.core.plugins.suspendTransaction
 import com.example.core.presenter.extension.catchingHttp
 import com.example.core.presenter.extension.catchingHttpAndId
-import com.example.modules.items.domain.ItemError
 import com.example.modules.locals.data.repository.HouseEntity
 import com.example.modules.locals.data.repository.Houses
 import com.example.modules.users.data.repository.UserEntity
 import com.example.modules.users.data.repository.UserTable
 import com.example.modules.users.presenter.dto.LoginRequestDto
 import com.example.modules.users.presenter.dto.RegisterUserDto
-import com.example.modules.users.domain.usecase.GetAllUserUsecase
 import com.example.modules.users.domain.usecase.LoginUserUsecase
 import com.example.modules.users.domain.usecase.RegisterUserUsecase
 import com.example.modules.users.domain.error.UserError
-import com.example.modules.users.domain.model.UserModel
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
@@ -33,18 +30,9 @@ import org.koin.ktor.ext.inject
 import kotlin.collections.mapNotNull
 
 fun Route.usersRoute(
-    getAllUserUsecase: GetAllUserUsecase = application.inject<GetAllUserUsecase>().value,
     registerUserUsecase: RegisterUserUsecase = application.inject<RegisterUserUsecase>().value,
     loginUserUsecase: LoginUserUsecase  = application.inject<LoginUserUsecase>().value
 ) = route("/users"){
-    authenticate(AuthenticationType.Core.value){
-        get{
-            catchingHttpAndId<UserError> { id ->
-                call.respond(getLocalUsers(id))
-            }
-        }
-    }
-
     get("login"){
         catchingHttp<UserError> {
             val tokenConfig = application.getTokenConfig()
@@ -63,18 +51,58 @@ fun Route.usersRoute(
     }
 
     authenticate(AuthenticationType.Core.value){
+        get{
+            catchingHttpAndId<UserError> { id ->
+                call.respond(getLocalUsers(id))
+            }
+        }
         get("id"){
             catchingHttp<UserError> {
                 val id = getUserId() ?: call.respond(HttpStatusCode.Unauthorized)
                 call.respond(id)
             }
         }
+        get("info"){
+            catchingHttpAndId<UserError> { id ->
+                val userInfoDto = getUserInfo(id)
+                call.respond(userInfoDto)
+            }
+        }
     }
+}
+
+private suspend fun CoreUser.Id.toEntity() = suspendTransaction {
+    UserEntity.find { UserTable.id eq value.toInt() }.firstOrNull() ?: throw UserError.NotFindedInDatabase
+}
+
+@Serializable data class UserInfoDto(val id:Int, val name: String, val house: HouseDto, val local: LocalDto)
+@Serializable data class HouseDto(val id: Int, val name: String)
+@Serializable data class LocalDto(val id: Int, val street: String, val number: Int, val postal: String, val name: String, val description: String)
+
+private suspend fun getUserInfo(id: CoreUser.Id): UserInfoDto = suspendTransaction{
+    val user = id.toEntity()
+    val house = user.house
+    val local = house.local
+    UserInfoDto(
+        id = user.id.value,
+        name = user.name,
+        house = HouseDto(
+            id = house.id.value,
+            name = house.description
+        ),
+        local = LocalDto(
+            id = local.id.value,
+            street = local.street,
+            number = local.number,
+            postal = local.postal,
+            name = local.name,
+            description = local.description
+        )
+    )
 }
 
 @Serializable data class LocalUserDto(val name: String, val id: Int, val houseName: String)
 private fun UserEntity.toLocalUser() = LocalUserDto(name,id.value,house.description)
-
 private suspend fun getLocalUsers(id: CoreUser.Id): List<LocalUserDto> = suspendTransaction{
     val userLocal = id.toEntity().house.local
     val allHouseIdsFromUserLocal = HouseEntity
@@ -88,11 +116,4 @@ private suspend fun getLocalUsers(id: CoreUser.Id): List<LocalUserDto> = suspend
             else it
         }
     allUsersFromUserLocal.map { it.toLocalUser() }
-}
-
-@Serializable data class GetUserResponseDto(val id:Long, val name: String)
-fun Pair<Long, UserModel>.toGetAllUser() = GetUserResponseDto(first, second.name.value)
-
-private suspend fun CoreUser.Id.toEntity() = suspendTransaction {
-    UserEntity.find { UserTable.id eq value.toInt() }.firstOrNull() ?: throw ItemError.NotFound("User")
 }
