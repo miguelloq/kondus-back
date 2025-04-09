@@ -27,7 +27,7 @@ class ItemRepository {
 
     suspend fun getItemById(loggedUser: CoreUser.Id, id:Int): ItemUserDto = suspendTransaction {
         val item = ItemEntity.findById(id) ?: throw ItemError.NotFound("Item")
-        if(item.user.house.id.value != loggedUser.toEntity().house.id.value ) throw ItemError.ActionNotPermitted
+        if(item.user.house.local.id.value != loggedUser.toEntity().house.local.id.value ) throw ItemError.ActionNotPermitted
         item.toItemUserDto()
     }
 
