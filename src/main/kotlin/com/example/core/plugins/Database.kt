@@ -8,10 +8,10 @@ import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 fun Application.configureDatabase(){
-    val url = environment.config.property("datasource.url").getString()
-    val user = environment.config.property("datasource.user").getString()
-    val password = environment.config.property("datasource.password").getString()
-    val driver = environment.config.property("datasource.driver").getString()
+    val url = environment.config.property("storage.jdbcURL").getString()
+    val user = environment.config.property("storage.user").getString()
+    val password = environment.config.property("storage.password").getString()
+    val driver = environment.config.property("storage.driverClassName").getString()
 
     Database.connect(
         url,
@@ -20,8 +20,12 @@ fun Application.configureDatabase(){
         driver = driver
     )
 
-    val flyway = Flyway.configure().dataSource(url, user, password).load()
-    flyway.migrate()
+    Flyway
+        .configure()
+        .dataSource(url, user, password)
+        .validateMigrationNaming(true)
+        .load()
+        .migrate()
 }
 
 suspend fun <T> suspendTransaction(block: suspend Transaction.() -> T): T =

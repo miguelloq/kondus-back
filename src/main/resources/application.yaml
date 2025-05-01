@@ -11,8 +11,8 @@ jwt:
     issuer: "http://localhost"
     secret: "abcde"
 
-datasource:
-    url: "jdbc:postgresql://localhost:5432/kondus_db"
+storage:
+    jdbcURL: "jdbc:postgresql://localhost:5432/kondus_db"
     user: "postgres"
     password: "password"
-    driver: "org.postgresql.Driver"
+    driverClassName: "org.postgresql.Driver"
