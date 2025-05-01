@@ -50,7 +50,8 @@ data class CategoryDto(
 data class UserDto(
     val id: Int,
     val name: String,
-    val house: String
+    val house: String,
+    val local: String
 )
 
 fun ItemEntity.toItemDto() = ItemDto(
@@ -69,11 +70,17 @@ fun CategoryEntity.toCategoryDto() = CategoryDto(
     name = name
 )
 
-fun ItemEntity.toItemUserDto() = ItemUserDto(
-    item = toItemDto(),
-    user = UserDto(
-        id = id.value,
-        name = user.name,
-        house = user.house.description
+fun ItemEntity.toItemUserDto(): ItemUserDto{
+    val itemUser = user
+    val itemHouse = itemUser.house
+    return ItemUserDto(
+        item = toItemDto(),
+        user = UserDto(
+            id = itemUser.id.value,
+            name = itemUser.name,
+            house = itemHouse.description,
+            local = itemHouse.local.name
+        )
     )
-)
+}
+
