@@ -48,6 +48,7 @@ data class CategoryDto(
 
 @Serializable
 data class UserDto(
+    val id: Int,
     val name: String,
     val house: String
 )
@@ -71,6 +72,7 @@ fun CategoryEntity.toCategoryDto() = CategoryDto(
 fun ItemEntity.toItemUserDto() = ItemUserDto(
     item = toItemDto(),
     user = UserDto(
+        id = id.value,
         name = user.name,
         house = user.house.description
     )
