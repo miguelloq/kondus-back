@@ -81,3 +81,9 @@ kotlin {
         freeCompilerArgs.add("-Xwhen-guards")
     }
 }
+
+ktor{
+    fatJar {
+        archiveFileName.set("kondus-back.jar")
+    }
+}
