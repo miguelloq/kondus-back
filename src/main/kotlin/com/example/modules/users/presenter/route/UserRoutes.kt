@@ -50,6 +50,10 @@ fun Route.usersRoute(
         }
     }
 
+    get("test"){
+        logDb()
+    }
+
     authenticate(AuthenticationType.Core.value){
         get{
             catchingHttpAndId<UserError> { id ->
@@ -116,4 +120,10 @@ private suspend fun getLocalUsers(id: CoreUser.Id): List<LocalUserDto> = suspend
             else it
         }
     allUsersFromUserLocal.map { it.toLocalUser() }
+}
+
+private fun logDb(){
+    println("url:${System.getenv("DATABASE_URL")}")
+    println("user:${System.getenv("DATABASE_USER")}")
+    println("password:${System.getenv("DATABASE_PASSWORD")}")
 }
