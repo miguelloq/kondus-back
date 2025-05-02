@@ -8,6 +8,7 @@ val koin_version: String by project
 val flyway_version: String by project
 val junit_version: String by project
 val mockk_version: String by project
+val aws_version: String by project
 
 plugins {
     kotlin("jvm") version "2.1.0"
@@ -70,6 +71,10 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:$junit_version")
     testImplementation("io.mockk:mockk:$mockk_version")
     testImplementation("io.ktor:ktor-server-test-host-jvm:$ktor_version")
+
+    //AWS
+    implementation("software.amazon.awssdk:s3:$aws_version")
+    implementation("software.amazon.awssdk:textract$aws_version")
 }
 
 tasks.test {
