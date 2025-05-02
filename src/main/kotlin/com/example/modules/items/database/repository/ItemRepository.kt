@@ -20,7 +20,9 @@ import org.jetbrains.exposed.sql.SizedCollection
 import org.jetbrains.exposed.sql.SizedIterable
 import org.jetbrains.exposed.sql.*
 
-class ItemRepository {
+class ItemRepository(
+    private val awsService: AwsService
+) {
     private suspend fun CoreUser.Id.toEntity() = suspendTransaction {
         UserEntity.find { UserTable.id eq value.toInt() }.firstOrNull() ?: throw ItemError.NotFound("User")
     }
