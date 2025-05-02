@@ -1,6 +1,7 @@
 package com.example
 
 import com.example.core.plugins.authentication.configureAuthentication
+import com.example.core.plugins.aws.configureAws
 import com.example.core.plugins.configureDatabase
 import com.example.core.plugins.configureDependencyInjection
 import com.example.core.plugins.configureRouting
@@ -12,6 +13,7 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
     configureDatabase()
+    configureAws()
     configureDependencyInjection()
     configureAuthentication()
     configureRouting()
