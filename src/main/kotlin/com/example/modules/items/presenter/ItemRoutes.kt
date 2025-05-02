@@ -78,7 +78,7 @@ fun Route.itemRoutes(
                 call.respond(HttpStatusCode.Created,itemId)
             }
         }
-        staticFiles("/images",File("images/items"))
+
         post("/images"){
             catchingHttpAndId<ItemError> { id ->
                 var itemId: Int? = null
@@ -97,14 +97,7 @@ fun Route.itemRoutes(
                     part.dispose()
                 }
                 val itemEntity = itemRepository.validateImages(id,itemId)
-                val imageNames = images.map { (bytes,name) ->
-                    val cryptoName = generateSecureRandomString(15) + "-" + name
-                    val imagePath = Paths.get("images/items", cryptoName)
-                    val imagem = File(imagePath.toUri())
-                    imagem.writeBytes(bytes)
-                    cryptoName
-                }
-                itemRepository.updateImages(itemEntity,imageNames)
+                itemRepository.updateImages(itemEntity,images)
                 call.respond(HttpStatusCode.Created)
             }
         }
@@ -126,12 +119,4 @@ private fun PartData.FileItem.isImage(): Boolean{
         "image/png", "image/jpeg", "image/jpg", "image/gif" -> true
         else -> false
     }
-}
-
-private fun generateSecureRandomString(length: Int): String {
-    val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&()-_=+"
-    val secureRandom = SecureRandom()
-    return (1..length)
-        .map { chars[secureRandom.nextInt(chars.length)] }
-        .joinToString("")
 }

@@ -19,6 +19,7 @@ import com.example.modules.users.data.repository.UserTable
 import org.jetbrains.exposed.sql.SizedCollection
 import org.jetbrains.exposed.sql.SizedIterable
 import org.jetbrains.exposed.sql.*
+import java.security.SecureRandom
 
 class ItemRepository(
     private val awsService: AwsService
@@ -61,11 +62,13 @@ class ItemRepository(
         itemEntity
     }
 
-    suspend fun updateImages(itemEntity: ItemEntity,imagePaths: List<String>) = suspendTransaction{
-        imagePaths.map {
+    suspend fun updateImages(itemEntity: ItemEntity, images: List<Pair<ByteArray,String?>>) = suspendTransaction{
+        images.forEach { (byteArray,name) ->
+            val cryptoName = generateSecureRandomString(15) + "-" + name
+            val awsS3ImagePath = awsService.uploadS3(cryptoName,byteArray)
             ItemImageEntity.new {
                 item = itemEntity
-                imagePath = it
+                imagePath = awsS3ImagePath
             }
         }
     }
@@ -126,4 +129,12 @@ class ItemRepository(
 
         allItemsFromUserLocal.map { it.toItemUserDto() }
     }
+}
+
+private fun generateSecureRandomString(length: Int): String {
+    val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&()-_=+"
+    val secureRandom = SecureRandom()
+    return (1..length)
+        .map { chars[secureRandom.nextInt(chars.length)] }
+        .joinToString("")
 }
