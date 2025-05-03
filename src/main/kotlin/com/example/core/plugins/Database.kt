@@ -7,9 +7,9 @@ import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 fun Application.configureDatabase(){
-    val url = System.getenv("DATABASE_URL") ?: error("DATABASE_URL not found")
-    val user = System.getenv("DATABASE_USER") ?: error("DATABASE_USER not found")
-    val password = System.getenv("DATABASE_PASSWORD") ?: error("DATABASE_PASSWORD not found")
+    val url = System.getenv("DATABASE_URL") ?: environment.config.property("storage.jdbcURL").getString()
+    val user = System.getenv("DATABASE_USER") ?: environment.config.property("storage.user").getString()
+    val password = System.getenv("DATABASE_PASSWORD") ?: environment.config.property("storage.password").getString()
     val driver = "org.postgresql.Driver"
 
     Database.connect(
