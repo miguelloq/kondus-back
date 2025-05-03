@@ -74,7 +74,7 @@ dependencies {
 
     //AWS
     implementation("software.amazon.awssdk:s3:$aws_version")
-    implementation("software.amazon.awssdk:textract$aws_version")
+    implementation("software.amazon.awssdk:textract:$aws_version")
 }
 
 tasks.test {
