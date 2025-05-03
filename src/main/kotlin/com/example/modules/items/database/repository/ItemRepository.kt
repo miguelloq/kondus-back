@@ -4,6 +4,7 @@ import com.example.core.models.CoreUser
 import com.example.core.plugins.suspendTransaction
 import com.example.modules.items.domain.ItemError
 import com.example.modules.items.domain.toItemTypeEnum
+import com.example.modules.items.presenter.ImageDto
 import com.example.modules.items.presenter.dto.CategoryDto
 import com.example.modules.items.presenter.dto.CreateItemDto
 import com.example.modules.items.presenter.dto.ItemDto
@@ -19,8 +20,11 @@ import com.example.modules.users.data.repository.UserTable
 import org.jetbrains.exposed.sql.SizedCollection
 import org.jetbrains.exposed.sql.SizedIterable
 import org.jetbrains.exposed.sql.*
+import java.security.SecureRandom
 
-class ItemRepository {
+class ItemRepository(
+    private val awsService: AwsService
+) {
     private suspend fun CoreUser.Id.toEntity() = suspendTransaction {
         UserEntity.find { UserTable.id eq value.toInt() }.firstOrNull() ?: throw ItemError.NotFound("User")
     }
@@ -59,11 +63,13 @@ class ItemRepository {
         itemEntity
     }
 
-    suspend fun updateImages(itemEntity: ItemEntity,imagePaths: List<String>) = suspendTransaction{
-        imagePaths.map {
+    suspend fun updateImages(itemEntity: ItemEntity, images: List<ImageDto>) = suspendTransaction{
+        images.forEach {
+            val cryptoName = generateSecureRandomString(15) + "-" + it.name
+            val awsS3ImagePath = awsService.uploadS3(cryptoName,it.bytes,it.contentType)
             ItemImageEntity.new {
                 item = itemEntity
-                imagePath = it
+                imagePath = awsS3ImagePath
             }
         }
     }
@@ -124,4 +130,12 @@ class ItemRepository {
 
         allItemsFromUserLocal.map { it.toItemUserDto() }
     }
+}
+
+private fun generateSecureRandomString(length: Int): String {
+    val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&()-_=+"
+    val secureRandom = SecureRandom()
+    return (1..length)
+        .map { chars[secureRandom.nextInt(chars.length)] }
+        .joinToString("")
 }
