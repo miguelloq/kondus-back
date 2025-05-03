@@ -4,6 +4,7 @@ import com.example.core.models.CoreUser
 import com.example.core.plugins.suspendTransaction
 import com.example.modules.items.domain.ItemError
 import com.example.modules.items.domain.toItemTypeEnum
+import com.example.modules.items.presenter.ImageDto
 import com.example.modules.items.presenter.dto.CategoryDto
 import com.example.modules.items.presenter.dto.CreateItemDto
 import com.example.modules.items.presenter.dto.ItemDto
@@ -62,10 +63,10 @@ class ItemRepository(
         itemEntity
     }
 
-    suspend fun updateImages(itemEntity: ItemEntity, images: List<Pair<ByteArray,String?>>) = suspendTransaction{
-        images.forEach { (byteArray,name) ->
-            val cryptoName = generateSecureRandomString(15) + "-" + name
-            val awsS3ImagePath = awsService.uploadS3(cryptoName,byteArray)
+    suspend fun updateImages(itemEntity: ItemEntity, images: List<ImageDto>) = suspendTransaction{
+        images.forEach {
+            val cryptoName = generateSecureRandomString(15) + "-" + it.name
+            val awsS3ImagePath = awsService.uploadS3(cryptoName,it.bytes,it.contentType)
             ItemImageEntity.new {
                 item = itemEntity
                 imagePath = awsS3ImagePath

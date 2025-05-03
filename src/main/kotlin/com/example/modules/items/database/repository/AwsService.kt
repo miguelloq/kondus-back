@@ -16,12 +16,14 @@ class AwsService(
     private fun getAwsUrl(fileName: String) =
         "https://${awsConfig.bucketName}.s3.${awsConfig.region}.amazonaws.com/$fileName"
 
-    fun uploadS3(name: String,byteArray: ByteArray): String{
+    fun uploadS3(name: String,byteArray: ByteArray, contentType: String): String{
         val s3Client = createS3Client(awsConfig)
 
         val putObjectRequest = PutObjectRequest.builder()
             .bucket(awsConfig.bucketName)
             .key(name)
+            .contentType(contentType)
+            .acl("public-read")
             .build()
 
         s3Client.putObject(putObjectRequest, RequestBody.fromBytes(byteArray))

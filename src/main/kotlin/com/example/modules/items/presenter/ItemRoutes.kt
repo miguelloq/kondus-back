@@ -10,14 +10,10 @@ import com.example.core.presenter.extension.catchingHttpAndId
 import com.example.modules.items.database.repository.ItemRepository
 import com.example.modules.items.domain.ItemError
 import com.example.modules.items.presenter.dto.CreateItemDto
-import com.example.modules.items.presenter.dto.ItemDto
 import com.example.modules.items.presenter.dto.ItemFinderDto
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
-import io.ktor.http.content.streamProvider
-import io.ktor.server.http.content.staticFiles
-import io.ktor.server.http.content.staticResources
 import io.ktor.server.request.receive
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.response.respond
@@ -27,9 +23,6 @@ import io.ktor.server.routing.post
 import io.ktor.utils.io.readBuffer
 import kotlinx.io.readByteArray
 import org.koin.ktor.ext.inject
-import java.io.File
-import java.nio.file.Paths
-import java.security.SecureRandom
 
 fun Route.itemRoutes(
     itemRepository: ItemRepository = application.inject<ItemRepository>().value
@@ -82,7 +75,7 @@ fun Route.itemRoutes(
         post("/images"){
             catchingHttpAndId<ItemError> { id ->
                 var itemId: Int? = null
-                val images = mutableListOf<Pair<ByteArray,String?>>()
+                val images = mutableListOf<ImageDto>()
                 call.receiveMultipart().forEachPart { part ->
                     when(part){
                         is PartData.FormItem if(part.name=="itemId") -> itemId = part.value.toIntOrNull()
@@ -90,7 +83,12 @@ fun Route.itemRoutes(
                             if(!part.isImage()) throw ItemError.InvalidField("Image","is not a image")
                             val fileBytes = part.provider().readBuffer().readByteArray()
                             val fileName =  part.originalFileName
-                            images.add(fileBytes to fileName)
+                            val contentType = part.contentType?.toString() ?: "image/jpeg"
+                            images.add(ImageDto(
+                                name = fileName,
+                                bytes = fileBytes,
+                                contentType = contentType
+                            ))
                         }
                         else -> Unit
                     }
@@ -120,3 +118,9 @@ private fun PartData.FileItem.isImage(): Boolean{
         else -> false
     }
 }
+
+class ImageDto(
+    val name: String?,
+    val bytes: ByteArray,
+    val contentType: String
+)
