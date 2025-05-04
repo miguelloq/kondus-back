@@ -65,8 +65,7 @@ class ItemRepository(
 
     suspend fun updateImages(itemEntity: ItemEntity, images: List<ImageDto>) = suspendTransaction{
         images.forEach {
-            val cryptoName = generateSecureRandomString(15) + "-" + it.name
-            val awsS3ImagePath = awsService.uploadS3(cryptoName,it.bytes,it.contentType)
+            val awsS3ImagePath = awsService.uploadS3(it)
             ItemImageEntity.new {
                 item = itemEntity
                 imagePath = awsS3ImagePath
@@ -130,12 +129,4 @@ class ItemRepository(
 
         allItemsFromUserLocal.map { it.toItemUserDto() }
     }
-}
-
-private fun generateSecureRandomString(length: Int): String {
-    val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&()-_=+"
-    val secureRandom = SecureRandom()
-    return (1..length)
-        .map { chars[secureRandom.nextInt(chars.length)] }
-        .joinToString("")
 }
